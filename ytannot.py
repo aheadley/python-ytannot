@@ -74,7 +74,7 @@ class AnnotationParser(object):
 
     def _parse_annotations(self, content):
         return xml_to_dict(content)
-
+    
     def format(self, content=None, video_id=None):
         if content is None:
             if video_id is None:
@@ -82,14 +82,19 @@ class AnnotationParser(object):
             else:
                 content = self._get_annotations(video_id)
         annot_struct = self._parse_annotations(content)
-        for event in annot_struct['document']['annotations']['annotation']:
-            start_ts = event['segment']['movingRegion']['rectRegion'][0].attrs['t']
-            end_ts = event['segment']['movingRegion']['rectRegion'][1].attrs['t']
-            self._sub_formatter.create_event(
-                text=event['TEXT'],
-                start='0'+start_ts.replace('.', ','),
-                end='0'+end_ts.replace('.', ','),
-            )
+        for event in (e for e in annot_struct['document']['annotations']['annotation'] if e.get('TEXT', False)):
+            try:
+                region = event['segment']['movingRegion']['rectRegion']
+            except KeyError:
+                region = event['segment']['movingRegion']['anchoredRegion']
+            start_ts = region[0].attrs['t']
+            end_ts = region[1].attrs['t']
+            if start_ts != 'never' and end_ts != 'never':
+                self._sub_formatter.create_event(
+                    text=event['TEXT'],
+                    start='0'+start_ts.replace('.', ','),
+                    end='0'+end_ts.replace('.', ','),
+                )
 
         return self._sub_formatter.generate()
 
