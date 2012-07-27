@@ -17,7 +17,7 @@ class NodeList(list):
     attrs = None
 
 class StrNode(unicode):
-    atts = None
+    attrs = None
 
 def xml_node_to_text(node):
     """
@@ -142,7 +142,7 @@ Active Line: 0
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Hyouka,51,&H00FFFFFF,&H000000FF,&H0004090F,&HB40C131C,-1,0,0,0,101,100,0.3,0,1,2.8,1,2,120,120,35,1
+Style: Default,Arial,51,&H00FFFFFF,&H000000FF,&H0004090F,&HB40C131C,-1,0,0,0,101,100,0.3,0,1,2.8,1,2,120,120,35,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
