@@ -74,7 +74,7 @@ class AnnotationParser(object):
 
     def _parse_annotations(self, content):
         return xml_to_dict(content)
-    
+
     def format(self, content=None, video_id=None):
         if content is None:
             if video_id is None:
@@ -118,11 +118,44 @@ class AbstractSubtitler(object):
 
 class SRTSubtitler(AbstractSubtitler):
     def generate(self):
-        events = sorted(self._events, key=lambda e: e['start'])
-        for i in range(len(events)):
-            events[i]['index'] = i+1
-        return '\n\n'.join(u'{index}\n{start} --> {end}\n{text}'.format(**event) \
-            for event in events)
+        return '\n\n'.join(u'{index}\n{start} --> {end}\n{text}'.format(
+            index=i+1,
+            start=self._format_ts(event['start']),
+            end=self._format_ts(event['end']),
+            text=event['text']) for i, event in \
+                enumerate(sorted(self._events, key=lambda e: e['start'])))
+
+    def _format_ts(self, ts):
+        return '{0:02d}:{1:02d}:{2:02d},{3:03d}'.format(
+            *map(int, ts.replace(',', ':').split(':')))
 
 class ASSSubtitler(AbstractSubtitler):
-    pass
+    def generate(self):
+        #totally copied from [Mazui]'s Hyouka 14
+        content = """[Script Info]
+ScriptType: v4.00+
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+Collisions: Normal
+Scroll Position: 0
+Active Line: 0
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Hyouka,51,&H00FFFFFF,&H000000FF,&H0004090F,&HB40C131C,-1,0,0,0,101,100,0.3,0,1,2.8,1,2,120,120,35,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+"""
+
+        return content + '\n'.join(self._format_event(event) for event in self._events)
+
+    def _format_event(self, event):
+        return u'Dialogue: 0,{start},{end},Default,,0000,0000,0000,,{text}'.format(
+            start=self._format_ts(event['start']),
+            end=self._format_ts(event['end']),
+            text=' '.join(l.strip() for l in event['text'].split('\n')))
+
+    def _format_ts(self, ts):
+        return '{0:02d}:{1:02d}:{2:02d}.{3:02d}'.format(
+            *map(int, ts.replace(',', ':').split(':')))
