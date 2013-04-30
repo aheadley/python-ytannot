@@ -126,8 +126,9 @@ class SRTSubtitler(AbstractSubtitler):
                 enumerate(sorted(self._events, key=lambda e: e['start'])))
 
     def _format_ts(self, ts):
-        return '{0:02d}:{1:02d}:{2:02d},{3:03d}'.format(
-            *map(int, ts.replace(',', ':').split(':')))
+        fields = ts.replace(',', '.').split(':')
+        fields = [int(fields[0]), int(fields[1]), float(fields[2])]
+        return '{0:02d}:{1:02d}:{2:06.3f}'.format(*fields).replace('.', ',')
 
 class ASSSubtitler(AbstractSubtitler):
     def generate(self):
