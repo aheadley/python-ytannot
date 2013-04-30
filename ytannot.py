@@ -6,7 +6,7 @@ from xml.dom.minidom import parseString
 # Senator, we're making
 # our final approach into Coruscant.
 
-ANNOTATION_URL = 'http://www.youtube.com/annotations/read2?feat=TCS&video_id={video_id}'
+ANNOTATION_URL = 'http://www.youtube.com/annotations_invideo/read2?features=0&legacy=1&mfu=0&pfc=0&video_id={video_id}'
 
 class NotTextNodeError(Exception): pass
 
